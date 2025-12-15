@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід - OlegCloud</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-300 flex items-center justify-center min-h-screen">
+
+    <div class="bg-gray-800 p-6 md:p-8 rounded-lg shadow-lg border border-gray-700 w-full max-w-md mx-4">
+        
+        <div class="flex justify-center mb-6">
+            <div class="flex items-center gap-2">
+                <svg class="h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.758A3.75 3.75 0 0 0 12 3c-1.268 0-2.417.47-3.32 1.257a3.75 3.75 0 0 0-4.09 4.904A4.5 4.5 0 0 0 2.25 15Z" />
+                </svg>
+                <span class="text-2xl font-bold text-gray-100">OlegCloud</span>
+            </div>
+        </div>
+
+        <div class="flex mb-6 bg-gray-700 rounded-lg p-1">
+    <button id="tab-login" onclick="switchTab('login')" 
+        class="flex-1 py-2 rounded-md text-sm font-medium bg-gray-600 text-white shadow transition-all">
+        Вхід
+    </button>
+    <button id="tab-register" onclick="switchTab('register')" 
+        class="flex-1 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white transition-all">
+        Реєстрація
+    </button>
+</div>
+
+        <form id="auth-form" onsubmit="handleAuth(event)">
+            
+            <div id="username-field" class="mb-4 hidden">
+                <label for="reg-username" class="block text-sm font-medium text-gray-400 mb-1">Ваше ім'я (Логін)</label>
+                <input type="text" id="reg-username" 
+                    class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500">
+            </div>
+
+            <div class="mb-4">
+                <label id="email-label" for="email" class="block text-sm font-medium text-gray-400 mb-1">Email або Логін</label>
+                <input type="text" id="email" required 
+                    class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500">
+            </div>
+
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-400 mb-1">Пароль</label>
+                <input type="password" id="password" required 
+                    class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500">
+            </div>
+            
+            <div id="error-msg" class="mb-4 text-red-500 text-sm hidden text-center"></div>
+            <div id="success-msg" class="mb-4 text-green-500 text-sm hidden text-center"></div>
+
+            <button type="submit" id="submit-btn" class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800">Увійти</button>
+        </form>
+    </div>
+
+
+    <script>
+        let isLogin = true;
+
+        function switchTab(tab) {
+            isLogin = (tab === 'login');
+            
+            // Елементи
+            const usernameField = document.getElementById('username-field');
+            const emailLabel = document.getElementById('email-label');
+            const btnLogin = document.getElementById('tab-login');
+            const btnRegister = document.getElementById('tab-register');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            // Скидання помилок
+            document.getElementById('error-msg').classList.add('hidden');
+            document.getElementById('success-msg').classList.add('hidden');
+
+            if (isLogin) {
+                // Режим ВХОДУ
+                usernameField.classList.add('hidden');          // Ховаємо ім'я
+                emailLabel.innerText = "Email або Логін";       // Міняємо підпис
+                document.getElementById('reg-username').required = false; 
+                
+                btnLogin.className = "flex-1 py-2 rounded-md text-sm font-medium bg-gray-600 text-white shadow transition-all";
+                btnRegister.className = "flex-1 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white transition-all";
+                submitBtn.innerText = "Увійти";
+            } else {
+                // Режим РЕЄСТРАЦІЇ
+                usernameField.classList.remove('hidden');       // Показуємо ім'я
+                emailLabel.innerText = "Email адреса";
+                document.getElementById('reg-username').required = true;
+
+                btnRegister.className = "flex-1 py-2 rounded-md text-sm font-medium bg-gray-600 text-white shadow transition-all";
+                btnLogin.className = "flex-1 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white transition-all";
+                submitBtn.innerText = "Зареєструватися";
+            }
+        }
+
+        async function handleAuth(event) {
+            event.preventDefault();
+            
+            const identifier = document.getElementById('email').value.trim(); // trim() прибирає пробіли
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('reg-username').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+            
+            // Очищення попередніх помилок
+            errorMsg.classList.add('hidden');
+
+            // --- 1. ВАЛІДАЦІЯ (ПЕРЕВІРКА) ДАНИХ ---
+            
+            if (!isLogin) {
+                // Якщо ми в режимі РЕЄСТРАЦІЇ:
+                
+                // А. Перевірка на валідність Email (професійний Regex)
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(identifier)) {
+                    errorMsg.innerText = "Будь ласка, введіть коректну Email адресу (наприклад: user@mail.com)";
+                    errorMsg.classList.remove('hidden');
+                    return; // Зупиняємо функцію, не відправляємо на сервер
+                }
+
+                // Б. (Опціонально) Якщо ви ДУЖЕ хочете тільки Gmail (для диплома), розкоментуйте це:
+                /*
+                if (!identifier.endsWith('@gmail.com')) {
+                    errorMsg.innerText = "Реєстрація дозволена тільки для пошти @gmail.com";
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+                */
+
+                // В. Перевірка довжини пароля
+                if (password.length < 6) {
+                    errorMsg.innerText = "Пароль має бути не менше 6 символів";
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            // --- 2. ВІДПРАВКА НА СЕРВЕР ---
+
+            const url = isLogin ? '/api/login' : '/api/register';
+            
+            let bodyData;
+            if (isLogin) {
+                bodyData = { identifier: identifier, password: password };
+            } else {
+                bodyData = { username: username, email: identifier, password: password };
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData)
+                });
+                
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Щось пішло не так');
+                }
+
+                if (isLogin) {
+                    localStorage.setItem('token', data.access_token);
+                    window.location.href = '/index.html';
+                } else {
+                    document.getElementById('success-msg').innerText = "Реєстрація успішна! Тепер увійдіть.";
+                    document.getElementById('success-msg').classList.remove('hidden');
+                    setTimeout(() => switchTab('login'), 1500);
+                }
+            } catch (error) {
+                errorMsg.innerText = error.message;
+                errorMsg.classList.remove('hidden');
+            }
+        }
+    </script>
+    
+</body>
+</html>

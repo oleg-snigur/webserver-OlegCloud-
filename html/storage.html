@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OlegCloud - Аналітика</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        /* Плавна анімація сайдбару */
+        .sidebar-transition { transition: transform 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-300 overflow-x-hidden">
+
+    <div class="md:hidden flex items-center justify-between p-4 bg-gray-800 border-b border-gray-700 sticky top-0 z-30">
+        <div class="flex items-center gap-2">
+            <svg class="h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.758A3.75 3.75 0 0 0 12 3c-1.268 0-2.417.47-3.32 1.257a3.75 3.75 0 0 0-4.09 4.904A4.5 4.5 0 0 0 2.25 15Z" /></svg>
+            <span class="text-xl font-bold text-gray-100">OlegCloud</span>
+        </div>
+        <button onclick="toggleSidebar()" class="text-gray-300 focus:outline-none">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="flex min-h-screen relative">
+        
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden glass"></div>
+
+        <aside id="sidebar" class="sidebar-transition fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 border-r border-gray-700 flex flex-col transform -translate-x-full md:translate-x-0 md:static md:h-screen">
+            <div class="hidden md:flex items-center justify-between p-4 border-b border-gray-700 h-16">
+                <a href="index.html" class="flex items-center gap-2 hover:opacity-80">
+                    <svg class="h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.758A3.75 3.75 0 0 0 12 3c-1.268 0-2.417.47-3.32 1.257a3.75 3.75 0 0 0-4.09 4.904A4.5 4.5 0 0 0 2.25 15Z" /></svg>
+                    <span class="text-xl font-bold text-gray-100">OlegCloud</span>
+                </a>
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-400">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="index.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-md font-medium transition-colors">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>
+                    <span>Мої файли</span>
+                </a>
+                <a href="storage.html" class="flex items-center gap-3 px-3 py-2 bg-blue-600 text-white rounded-md font-medium transition-colors">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                    <span>Аналітика</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-gray-700 bg-gray-800">
+                <div class="flex items-center gap-3 mb-3">
+                    <div id="user-avatar" class="h-8 w-8 rounded-full flex items-center justify-center text-white font-bold transition-colors">U</div>
+                    <div class="overflow-hidden"><p class="text-sm font-medium text-white truncate" id="user-email-display">user</p></div>
+                </div>
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-900/50 rounded-md border border-gray-700 transition-colors hover:border-red-800">Вийти</button>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto h-[calc(100vh-64px)] md:h-screen">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-100 mb-6 md:mb-8">Використання сховища</h1>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+                <div class="bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-700 shadow-lg">
+                    <h3 class="text-gray-400 text-xs md:text-sm font-medium uppercase">Зайнято</h3>
+                    <p class="text-2xl md:text-3xl font-bold text-white mt-2" id="stat-used">0 MB</p>
+                </div>
+                <div class="bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-700 shadow-lg">
+                    <h3 class="text-gray-400 text-xs md:text-sm font-medium uppercase">Вільно</h3>
+                    <p class="text-2xl md:text-3xl font-bold text-green-400 mt-2" id="stat-free">100 MB</p>
+                </div>
+                <div class="bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-700 shadow-lg">
+                    <h3 class="text-gray-400 text-xs md:text-sm font-medium uppercase">Всього місця</h3>
+                    <p class="text-2xl md:text-3xl font-bold text-blue-400 mt-2" id="stat-total">100 MB</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-700 shadow-lg mb-8">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300 font-medium">Заповненість диску</span>
+                    <span class="text-gray-400" id="stat-percent">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-4">
+                    <div id="stat-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
+                <div class="bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-700 shadow-lg flex flex-col items-center justify-center">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-6 w-full text-left">Структура файлів</h3>
+                    <div class="w-full max-w-[250px] aspect-square">
+                        <canvas id="storageChartPage"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-700 shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-4">Деталі по типах</h3>
+                    <ul class="space-y-4" id="stat-details-list">
+                        <li class="text-gray-500 text-center py-4">Завантаження даних...</li>
+                    </ul>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

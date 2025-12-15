@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: webserver-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: mydb
+    volumes:
+      # ЗМІНА ТУТ: Зберігаємо дані у папку ./pg_data у вашому проекті
+      - ./pg_data:/var/lib/postgresql/data
+    networks:
+      - webnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: webserver-backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+      - ./backend:/app
+    networks:
+      - webnet
+
+  nginx:
+    image: nginx:latest
+    container_name: webserver-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - webnet
+
+networks:
+  webnet:
