@@ -2,13 +2,13 @@ from fastapi import FastAPI
 import database, models
 from auth import router as auth_router
 from files import router as files_router
+from s3 import init_bucket
 
 app = FastAPI()
 
-# Налаштування статичних файлів
-from fastapi.staticfiles import StaticFiles
-import os
-os.makedirs("uploads", exist_ok=True) 
+@app.on_event("startup")
+async def startup_event():
+    await init_bucket()
 
 @app.get("/")
 def root():

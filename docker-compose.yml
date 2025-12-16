@@ -4,12 +4,10 @@ services:
   db:
     image: postgres:15
     container_name: webserver-db
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: mydb
+    # Читаємо змінні з файлу в папці backend
+    env_file:
+      - ./backend/.env
     volumes:
-      # ЗМІНА ТУТ: Зберігаємо дані у папку ./pg_data у вашому проекті
       - ./pg_data:/var/lib/postgresql/data
     networks:
       - webnet
@@ -28,8 +26,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # Читаємо той самий файл
+    env_file:
+      - ./backend/.env
     volumes:
-      - ./uploads:/app/uploads
       - ./backend:/app
     networks:
       - webnet
@@ -47,6 +47,25 @@ services:
       - backend
     networks:
       - webnet
+
+  minio:
+    image: minio/minio:latest
+    container_name: webserver-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    # Тут теж вказуємо шлях до backend/.env
+    env_file:
+      - ./backend/.env
+    volumes:
+      - minio_data:/data
+    networks:
+      - webnet
+
+volumes:
+  pg_data:
+  minio_data:
 
 networks:
   webnet:
