@@ -5,8 +5,6 @@ from files import router as files_router
 
 app = FastAPI()
 
-models.Base.metadata.create_all(bind=database.engine)
-
 # Налаштування статичних файлів
 from fastapi.staticfiles import StaticFiles
 import os

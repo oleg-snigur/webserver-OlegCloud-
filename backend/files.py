@@ -6,6 +6,7 @@ import shutil
 import os
 import uuid
 from typing import List
+import aiofiles
 
 import models, database, auth
 
@@ -18,7 +19,7 @@ MAX_USER_QUOTA_MB = 100
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
-def upload_file(
+async def upload_file(
     file: UploadFile = File(...), 
     current_user: models.User = Depends(auth.get_current_user), 
     db: Session = Depends(database.get_db)
@@ -54,9 +55,13 @@ def upload_file(
 
     # 4. Зберігаємо фізично
     try:
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception:
+        # Відкриваємо файл через aiofiles (не блокує сервер)
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            # Читаємо файл шматками по 1MB (економить оперативну пам'ять)
+            while content := await file.read(1024 * 1024): 
+                await out_file.write(content)
+    except Exception as e:
+        print(f"Error saving file: {e}")
         raise HTTPException(status_code=500, detail="Помилка збереження файлу")
 
     # 5. Записуємо в базу
