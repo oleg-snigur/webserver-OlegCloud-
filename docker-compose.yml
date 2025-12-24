@@ -61,6 +61,18 @@ services:
     networks:
       - webnet
 
+  dashboard:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: webserver-dashboard
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "127.0.0.1,localhost,debian-pc:3000"
+    volumes:
+      - ./dashboard_config:/app/config # Папка з налаштуваннями
+      - /var/run/docker.sock:/var/run/docker.sock # Щоб бачити статус інших контейнерів
+    ports:
+      - "3000:3000"
+    networks:
+      - webnet
 volumes:
   pg_data:
   minio_data:
