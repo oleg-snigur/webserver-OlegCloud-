@@ -110,6 +110,29 @@
             <div id="files-table-container" class="hidden pb-20">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-gray-200">Ваші документи</h2>
+			<div id="bulk-actions" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 border border-gray-600 shadow-2xl rounded-full px-6 py-3 z-50 flex items-center gap-6 animate-fade-in-up">
+    			    <div class="flex items-center gap-2 border-r border-gray-600 pr-6">
+			        <div class="bg-blue-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center" id="selected-count-badge">0</div>
+			        <span class="text-sm font-medium text-gray-300">Вибрано</span>
+			    </div>
+
+			    <div class="flex items-center gap-2">
+			        <button onclick="alert('Функція скоро з\'явиться!')" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full transition-colors tooltip" title="Поділитися">
+			            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+			        </button>
+
+			        <button onclick="alert('Функція скоро з\'явиться!')" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full transition-colors" title="Перемістити">
+			            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+			        </button>
+
+			        <div class="w-px h-6 bg-gray-600 mx-2"></div>
+
+			        <button onclick="window.deleteSelectedFiles()" class="text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
+			            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+			            <span>Видалити</span>
+			        </button>
+			    </div>
+			</div>
                     <label for="file-input" class="bg-blue-600 hover:bg-blue-500 text-white px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer shadow-lg active:scale-95">
                         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
                         <span class="hidden md:inline">Додати файл</span> <span class="md:hidden">Додати</span>
@@ -134,7 +157,7 @@
                 </div>
             </div>
 
-            <input type="file" id="file-input" class="opacity-0 absolute w-1 h-1 -z-10" onchange="uploadFile(this)">
+            <input type="file" id="file-input" multiple class="opacity-0 absolute w-1 h-1 -z-10" onchange="uploadFile(this)">
             
             <div id="progress-container" class="hidden fixed bottom-4 right-4 w-80 bg-gray-800 border border-gray-700 p-4 rounded-xl shadow-2xl z-50">
                 <div class="flex justify-between mb-1">
@@ -170,7 +193,13 @@
 
         </main>
     </div>
-
+	<div id="drop-zone" class="hidden fixed inset-0 z-[100] bg-gray-900/90 flex flex-col items-center justify-center backdrop-blur-sm transition-all border-4 border-dashed border-blue-500 m-4 rounded-3xl">
+	    <svg class="h-24 w-24 text-blue-500 mb-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+	    </svg>
+	    <h2 class="text-3xl font-bold text-white mb-2">Відпустіть файли тут</h2>
+	    <p class="text-blue-200 text-lg">щоб почати завантаження</p>
+	</div>
     <script type="module" src="js/main.js"></script>
 </body>
 </html>
