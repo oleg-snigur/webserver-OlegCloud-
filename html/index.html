@@ -74,7 +74,7 @@
                         <p class="text-sm font-medium text-white truncate" id="user-email-display">user</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-900/50 rounded-md transition-colors border border-gray-700 hover:border-red-800">
+                <button onclick="window.logout()" class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-900/50 rounded-md transition-colors border border-red-800 hover:border-red-800">
                     Вийти
                 </button>
             </div>
@@ -109,7 +109,10 @@
                 </svg>
                 <h3 class="mt-2 text-sm font-semibold text-gray-100">Немає файлів</h3>
                 <p class="mt-1 text-sm text-gray-400">Завантажте свій перший файл.</p>
-                <div class="mt-6">
+                <div class="mt-6 flex gap-2 justify-center">
+                    <button onclick="window.createFolder()" class="inline-flex items-center rounded-md bg-gray-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 transition-colors">
+                        Створити папку
+                    </button>
                     <label for="file-input" class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors cursor-pointer">
                         Завантажити файл
                     </label>
@@ -118,22 +121,32 @@
 
             <div id="files-table-container" class="hidden pb-24">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold text-gray-200">Ваші документи</h2>
-                    <label for="file-input" class="bg-blue-600 hover:bg-blue-500 text-white px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer shadow-lg active:scale-95">
-                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
-                        <span class="hidden md:inline">Додати файл</span> <span class="md:hidden">Додати</span>
-                    </label>
+                    <h2 id="breadcrumbs-title" class="text-xl font-semibold text-gray-200 flex items-center gap-2 overflow-hidden">
+                        Ваші документи
+                    </h2>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="window.createFolder()" class="bg-gray-700 hover:bg-gray-600 text-white px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer shadow-lg active:scale-95 border border-gray-600">
+                             <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                             <span class="hidden md:inline">Папка</span>
+                        </button>
+
+                        <label for="file-input" class="bg-blue-600 hover:bg-blue-500 text-white px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer shadow-lg active:scale-95">
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+                            <span class="hidden md:inline">Додати файл</span> <span class="md:hidden">Додати</span>
+                        </label>
+                    </div>
                 </div>
 
-                <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-visible min-h-[200px]">
+                <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-visible">
                     <div class="overflow-x-auto md:overflow-visible">
                         <table class="min-w-full divide-y divide-gray-700">
                             <thead class="bg-gray-700/50">
                                 <tr>
-                                    <th class="w-12 px-4 py-3 text-left"></th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Назва</th>
-                                    <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Дата</th>
-                                    <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Розмір</th>
+                                    <th class="w-12 px-4 py-3 text-left checkbox-col"></th>
+                                    <th onclick="window.handleSort('filename')" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white">Назва</th>
+                                    <th onclick="window.handleSort('created_at')" class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white">Дата</th>
+                                    <th onclick="window.handleSort('size')" class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white">Розмір</th>
                                     <th class="relative px-6 py-3"><span class="sr-only">Дії</span></th>
                                 </tr>
                             </thead>
@@ -144,7 +157,7 @@
                 </div>
             </div>
 
-            <input type="file" id="file-input" multiple class="opacity-0 absolute w-1 h-1 -z-10" onchange="uploadFile(this)">
+            <input type="file" id="file-input" multiple class="opacity-0 absolute w-1 h-1 -z-10" onchange="window.uploadFile(this)">
             
             <div id="progress-container" class="hidden fixed bottom-24 md:bottom-4 right-4 w-80 bg-gray-800 border border-gray-700 p-4 rounded-xl shadow-2xl z-50">
                 <div class="flex justify-between mb-1">
@@ -161,7 +174,7 @@
                 <div class="bg-gray-800 rounded-lg shadow-2xl w-full max-w-7xl h-[85vh] md:h-[90vh] flex flex-col border border-gray-700">
                     <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-800 rounded-t-lg">
                         <h3 id="modal-filename" class="text-base md:text-lg font-semibold text-gray-100 truncate pr-4">Перегляд</h3>
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <button onclick="window.closeModal()" class="text-gray-400 hover:text-white transition-colors">
                             <svg class="h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
@@ -169,7 +182,7 @@
                         <span class="text-gray-500 animate-pulse">Завантаження...</span>
                     </div>
                     <div class="p-4 border-t border-gray-700 bg-gray-800 rounded-b-lg flex justify-between items-center">
-                        <button onclick="closeModal()" class="px-3 py-2 md:px-4 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm md:text-base">Закрити</button>
+                        <button onclick="window.closeModal()" class="px-3 py-2 md:px-4 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm md:text-base">Закрити</button>
                         <a id="download-link" href="#" download class="px-3 py-2 md:px-4 bg-blue-600 text-white rounded hover:bg-blue-500 flex items-center gap-2 text-sm md:text-base">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                             Скачати
@@ -178,34 +191,65 @@
                 </div>
             </div>
 
-		<div id="bulk-actions" class="hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[90%] md:w-auto bg-gray-800 border border-gray-600 shadow-2xl rounded-2xl md:rounded-full px-4 py-3 z-[60] flex items-center justify-between md:justify-center gap-4 md:gap-6 animate-fade-in-up">
-    
-		    <div class="flex items-center gap-2 md:border-r md:border-gray-600 md:pr-6">
-		        <div class="bg-blue-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center flex-shrink-0" id="selected-count-badge">0</div>
-		        <span class="text-sm font-medium text-gray-300 whitespace-nowrap">Вибрано</span>
-		    </div>
+            <div id="move-modal" class="hidden fixed inset-0 z-[80] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+                <div class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border border-gray-700 flex flex-col max-h-[80vh]">
+                    <div class="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800 rounded-t-xl">
+                        <h3 class="text-lg font-semibold text-white">Перемістити до...</h3>
+                        <div class="flex items-center gap-1">
+                            <button onclick="window.createFolderInModal()" class="p-2 text-blue-400 hover:text-white hover:bg-gray-700 rounded transition-colors" title="Створити нову папку тут">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                            </button>
+                            <button onclick="document.getElementById('move-modal').classList.add('hidden')" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                    </div>
 
-		    <div class="flex items-center gap-2 md:gap-3">
-		        <button onclick="window.downloadSelectedFiles()" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full transition-colors flex-shrink-0">
-		             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-		        </button>
+                    <div class="px-4 py-2 bg-gray-900/50 border-b border-gray-700 text-sm flex items-center gap-2 overflow-x-auto whitespace-nowrap" id="move-breadcrumbs">
+                        <span class="text-gray-400">Головна</span>
+                    </div>
 
-		        <button onclick="alert('Скоро!')" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full transition-colors flex-shrink-0">
-		            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-		        </button>
+                    <div id="move-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+                        <div class="text-center text-gray-500 py-4">Завантаження...</div>
+                    </div>
 
-		        <div class="w-px h-6 bg-gray-600 mx-1 hidden md:block"></div>
+                    <div class="p-4 border-t border-gray-700 flex justify-end gap-3 bg-gray-800 rounded-b-xl">
+                        <button onclick="document.getElementById('move-modal').classList.add('hidden')" class="px-4 py-2 text-gray-300 hover:text-white transition-colors">Скасувати</button>
+                        <button onclick="window.submitMove()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium shadow-lg transition-transform active:scale-95">
+                            Перемістити сюди
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-		        <button onclick="window.deleteSelectedFiles()" class="text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
-		            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-		            <span class="hidden md:inline">Видалити</span>
-		        </button>
-		    </div>
-		</div>
+            <div id="bulk-actions" class="hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[90%] md:w-auto bg-gray-800 border border-gray-600 shadow-2xl rounded-2xl md:rounded-full px-4 py-3 z-[60] flex items-center justify-between md:justify-center gap-4 md:gap-6 animate-fade-in-up">
+                
+                <div class="flex items-center gap-2 md:border-r md:border-gray-600 md:pr-6">
+                    <div class="bg-blue-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center flex-shrink-0" id="selected-count-badge">0</div>
+                    <span class="text-sm font-medium text-gray-300 whitespace-nowrap">Вибрано</span>
+                </div>
+
+                <div class="flex items-center gap-2 md:gap-3">
+                    <button onclick="window.downloadSelectedFiles()" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full transition-colors flex-shrink-0">
+                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    </button>
+
+                    <button onclick="alert('Скоро!')" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full transition-colors flex-shrink-0">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                    </button>
+
+                    <div class="w-px h-6 bg-gray-600 mx-1 hidden md:block"></div>
+
+                    <button onclick="window.deleteSelectedFiles()" class="text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        <span class="hidden md:inline">Видалити</span>
+                    </button>
+                </div>
+            </div>
         </main>
     </div>
 
-<div id="drop-zone" class="hidden fixed inset-0 z-[100] bg-gray-900/90 flex flex-col items-center justify-center backdrop-blur-sm transition-all border-4 border-dashed border-blue-500 m-4 rounded-3xl">
+    <div id="drop-zone" class="hidden fixed inset-0 z-[100] bg-gray-900/90 flex flex-col items-center justify-center backdrop-blur-sm transition-all border-4 border-dashed border-blue-500 m-4 rounded-3xl">
         <svg class="h-24 w-24 text-blue-500 mb-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
         </svg>
@@ -213,29 +257,34 @@
         <p class="text-blue-200 text-lg">щоб почати завантаження</p>
     </div>
 
-	<div id="context-menu" class="hidden fixed z-[70] w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl py-1 text-sm text-gray-200 overflow-hidden transform transition-opacity duration-100">
-    <button id="ctx-view" class="w-full text-left px-4 py-2 hover:bg-gray-700 flex items-center gap-2 transition-colors">
-        <svg class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-        Переглянути
-    </button>
-    
-    <button id="ctx-download" class="w-full text-left px-4 py-2 hover:bg-gray-700 flex items-center gap-2 transition-colors">
-        <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-        Скачати
-    </button>
-    
-    <button id="ctx-rename" class="w-full text-left px-4 py-2 hover:bg-gray-700 flex items-center gap-2 transition-colors">
-        <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-        Перейменувати
-    </button>
+    <div id="context-menu" class="hidden fixed z-[70] w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl py-1 text-sm text-gray-200 overflow-hidden transform transition-opacity duration-100">
+        <button id="ctx-view" class="w-full text-left px-4 py-2 hover:bg-gray-700 flex items-center gap-2 transition-colors">
+            <svg class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            Переглянути
+        </button>
+        
+        <button id="ctx-download" class="w-full text-left px-4 py-2 hover:bg-gray-700 flex items-center gap-2 transition-colors">
+            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Скачати
+        </button>
 
-    <div class="border-t border-gray-700 my-1"></div>
-    
-    <button id="ctx-delete" class="w-full text-left px-4 py-2 hover:bg-red-900/50 text-red-400 flex items-center gap-2 transition-colors">
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-        Видалити
-    </button>
-</div>
+        <button id="ctx-move" class="w-full text-left px-4 py-2 hover:bg-gray-700 flex items-center gap-2 transition-colors">
+             <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+             Перемістити
+        </button>
+        
+        <button id="ctx-rename" class="w-full text-left px-4 py-2 hover:bg-gray-700 flex items-center gap-2 transition-colors">
+            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            Перейменувати
+        </button>
+
+        <div class="border-t border-gray-700 my-1"></div>
+        
+        <button id="ctx-delete" class="w-full text-left px-4 py-2 hover:bg-red-900/50 text-red-400 flex items-center gap-2 transition-colors">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            Видалити
+        </button>
+    </div>
 
     <script type="module" src="js/main.js"></script>
 </body>

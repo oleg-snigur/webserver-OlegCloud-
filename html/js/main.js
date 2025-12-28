@@ -3,31 +3,49 @@ import { isLoggedIn, logout } from './api.js';
 import { 
     loadFiles, uploadFile, deleteFile, downloadFile, viewFile, closeModal, handleSearch,
     toggleFileSelection, toggleSelectAll, deleteSelectedFiles, downloadSelectedFiles,
-    handleSort, startRename, saveRename, cancelRename, handleContextMenu
+    handleSort, startRename, saveRename, cancelRename, handleContextMenu,
+    startMove, submitMove, createFolder, createFolderInModal, loadMoveFolders
 } from './files.js';
 import { renderUserAvatar, toggleSidebar, toggleDropdown, initDropdownListeners } from './ui.js';
 import { getCurrentUser } from './auth.js';
 import { initStoragePage } from './charts.js';
 
-// Експорт в глобальну область
+// --- ЕКСПОРТ ФУНКЦІЙ (Щоб HTML їх бачив) ---
+
+// Основні
 window.logout = logout;
 window.toggleSidebar = toggleSidebar;
 window.toggleDropdown = toggleDropdown;
+window.closeModal = closeModal;
+
+// Файли та папки
+window.loadFiles = loadFiles; // <--- ОСЬ ЦЬОГО РЯДКА НЕ ВИСТАЧАЛО!
 window.uploadFile = uploadFile;
 window.deleteFile = deleteFile;
 window.downloadFile = downloadFile;
 window.viewFile = viewFile;
-window.closeModal = closeModal;
+window.createFolder = createFolder;
+window.createFolderInModal = createFolderInModal;
+
+// Масові дії та пошук
 window.handleSearch = handleSearch;
 window.toggleFileSelection = toggleFileSelection;
 window.toggleSelectAll = toggleSelectAll;
 window.deleteSelectedFiles = deleteSelectedFiles;
 window.downloadSelectedFiles = downloadSelectedFiles;
+
+// Редагування та сортування
 window.handleSort = handleSort;
 window.startRename = startRename;
 window.saveRename = saveRename;
 window.cancelRename = cancelRename;
 window.handleContextMenu = handleContextMenu;
+
+// Переміщення
+window.startMove = startMove;
+window.submitMove = submitMove;
+window.loadMoveFolders = loadMoveFolders;
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Авторизація
@@ -46,7 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const isStorage = document.getElementById('storageChartPage');
 
     if (isDashboard) {
-        loadFiles();
+        loadFiles(); // Завантажуємо корінь
+        
         document.addEventListener('click', (e) => {
             const searchContainer = document.querySelector('.search-container');
             const dropdown = document.getElementById('search-results-dropdown');
@@ -55,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // 4. Ініціалізація Drag-and-Drop
         initDragAndDrop();
     } 
     
