@@ -22,3 +22,5 @@ Thumbs.db
 
 npm_data/
 npm_letsencrypt/
+
+dashboard_config/logs/

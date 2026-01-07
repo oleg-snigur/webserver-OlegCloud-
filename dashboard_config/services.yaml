@@ -1,0 +1,22 @@
+- Мій Сервер:
+    - Мій Хмарний Сайт:
+        icon: cloud-upload.png
+        href: http://olegcloud.ddns.net
+        description: Головна сторінка
+        server: my-docker # Підключення до докера для статусу
+        container: webserver-backend
+
+    - Nginx Proxy Manager:
+        icon: nginx-proxy-manager.png
+        href: http://debian-pc:81
+        description: Керування доменами та SSL
+        server: my-docker
+        container: webserver-npm
+
+    - MinIO Console:
+        icon: minio.png
+        href: http://debian-pc:9001
+        description: Керування файлами
+        server: my-docker
+        container: webserver-minio
+     
