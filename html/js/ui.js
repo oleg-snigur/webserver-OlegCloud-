@@ -83,22 +83,3 @@ export function toggleDropdown(event, id) {
         openDropdownId = null;
     }
 }
-
-// Закриття меню при кліку будь-де
-export function initDropdownListeners() {
-    window.addEventListener('click', () => {
-        if (openDropdownId !== null) {
-            const menu = document.getElementById(`dropdown-${openDropdownId}`);
-            if (menu) menu.classList.add('hidden');
-            openDropdownId = null;
-        }
-    });
-
-    window.addEventListener('scroll', () => {
-        if (openDropdownId !== null) {
-            const menu = document.getElementById(`dropdown-${openDropdownId}`);
-            if (menu) menu.classList.add('hidden');
-            openDropdownId = null;
-        }
-    }, true);
-}

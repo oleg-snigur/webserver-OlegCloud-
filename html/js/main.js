@@ -1,25 +1,23 @@
-// js/main.js
 import { isLoggedIn, logout } from './api.js';
 import { 
     loadFiles, uploadFile, deleteFile, downloadFile, viewFile, closeModal, handleSearch,
     toggleFileSelection, toggleSelectAll, deleteSelectedFiles, downloadSelectedFiles,
     handleSort, startRename, saveRename, cancelRename, handleContextMenu,
-    startMove, submitMove, createFolder, createFolderInModal, loadMoveFolders
+    startMove, submitMove, createFolder, createFolderInModal,
+    toggleDropdown, // <--- ТЕПЕР ІМПОРТУЄМО З files.js
+    resetInterfaceState // <--- ІМПОРТУЄМО ДЛЯ ГЛОБАЛЬНОГО КЛІКУ
 } from './files.js';
-import { renderUserAvatar, toggleSidebar, toggleDropdown, initDropdownListeners } from './ui.js';
+import { renderUserAvatar, toggleSidebar } from './ui.js';
 import { getCurrentUser } from './auth.js';
 import { initStoragePage } from './charts.js';
 
-// --- ЕКСПОРТ ФУНКЦІЙ (Щоб HTML їх бачив) ---
-
-// Основні
+// Експорт функцій у глобальну область
 window.logout = logout;
 window.toggleSidebar = toggleSidebar;
-window.toggleDropdown = toggleDropdown;
+window.toggleDropdown = toggleDropdown; // <--- Використовуємо нашу нову, розумну функцію
 window.closeModal = closeModal;
 
-// Файли та папки
-window.loadFiles = loadFiles; // <--- ОСЬ ЦЬОГО РЯДКА НЕ ВИСТАЧАЛО!
+window.loadFiles = loadFiles;
 window.uploadFile = uploadFile;
 window.deleteFile = deleteFile;
 window.downloadFile = downloadFile;
@@ -27,45 +25,48 @@ window.viewFile = viewFile;
 window.createFolder = createFolder;
 window.createFolderInModal = createFolderInModal;
 
-// Масові дії та пошук
 window.handleSearch = handleSearch;
 window.toggleFileSelection = toggleFileSelection;
 window.toggleSelectAll = toggleSelectAll;
 window.deleteSelectedFiles = deleteSelectedFiles;
 window.downloadSelectedFiles = downloadSelectedFiles;
 
-// Редагування та сортування
 window.handleSort = handleSort;
 window.startRename = startRename;
 window.saveRename = saveRename;
 window.cancelRename = cancelRename;
 window.handleContextMenu = handleContextMenu;
 
-// Переміщення
 window.startMove = startMove;
 window.submitMove = submitMove;
-window.loadMoveFolders = loadMoveFolders;
 
+// Глобальний слухач кліків для закриття меню
+// Додаємо це, щоб клік по будь-якому місцю сторінки закривав меню
+document.addEventListener('click', (e) => {
+    // Якщо клік не по кнопці dropdown і не по самому dropdown
+    if (!e.target.closest('.dropdown-container')) {
+        resetInterfaceState();
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Авторизація
     if (!isLoggedIn()) {
         window.location.href = '/login.html';
         return;
     }
 
-    // 2. Ініціалізація UI
-    initDropdownListeners();
+    // initDropdownListeners(); // <-- ЦЕ МОЖНА ВИДАЛИТИ, ми тепер керуємо цим самі через resetInterfaceState
+    
     const user = getCurrentUser();
     if (user && user.sub) renderUserAvatar(user.sub);
 
-    // 3. Маршрутизація
     const isDashboard = document.getElementById('files-table-body');
     const isStorage = document.getElementById('storageChartPage');
 
     if (isDashboard) {
-        loadFiles(); // Завантажуємо корінь
+        loadFiles();
         
+        // Закриття пошуку
         document.addEventListener('click', (e) => {
             const searchContainer = document.querySelector('.search-container');
             const dropdown = document.getElementById('search-results-dropdown');
