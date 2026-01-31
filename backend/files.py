@@ -186,6 +186,36 @@ async def download_file(
         print(f"S3 Download Error: {e}")
         raise HTTPException(status_code=404, detail="Файл не знайдено в сховищі")
 
+# backend/files.py
+
+# --- Допоміжна функція (тільки збирає ID та шляхи) ---
+def collect_deletion_data(folder_id: int, db: Session, user_id: int):
+    """
+    Рекурсивно збирає всі ID папок, ID файлів та S3-ключі для видалення.
+    Не робить змін у БД чи S3. Тільки Read.
+    """
+    folder_ids = [folder_id]
+    file_ids = []
+    s3_keys = []
+
+    # Знаходимо підпапки
+    subfolders = db.query(models.Folder).filter(models.Folder.parent_id == folder_id).all()
+    for sub in subfolders:
+        sub_data = collect_deletion_data(sub.id, db, user_id)
+        folder_ids.extend(sub_data['folder_ids'])
+        file_ids.extend(sub_data['file_ids'])
+        s3_keys.extend(sub_data['s3_keys'])
+
+    # Знаходимо файли в поточній папці
+    files = db.query(models.File).filter(models.File.folder_id == folder_id).all()
+    for f in files:
+        file_ids.append(f.id)
+        s3_keys.append(f.path)
+
+    return {"folder_ids": folder_ids, "file_ids": file_ids, "s3_keys": s3_keys}
+
+
+# --- Оновлений Endpoint ---
 @router.delete("/delete/{item_id}")
 async def delete_item(
     item_id: int,
@@ -195,29 +225,63 @@ async def delete_item(
     db: Session = Depends(database.get_db),
     s3 = Depends(get_s3_client)
 ):
+    # 1. Логіка для ФАЙЛУ
     if type == 'file':
         file_record = db.query(models.File).filter(models.File.id == item_id).first()
         if not file_record or file_record.owner_id != current_user.id:
             raise HTTPException(status_code=404, detail="Файл не знайдено")
+        
+        # Спочатку видаляємо з S3 (використовуємо await!)
         try:
             await s3.delete_object(Bucket=BUCKET_NAME, Key=file_record.path)
         except Exception as e:
-            print(f"S3 Delete Warning: {e}")
+            print(f"S3 Delete Warning: {e}") # Логуємо, але дозволяємо видалити з БД
+            
         db.delete(file_record)
         db.commit()
 
+    # 2. Логіка для ПАПКИ
     elif type == 'folder':
         folder = db.query(models.Folder).filter(models.Folder.id == item_id).first()
         if not folder or folder.owner_id != current_user.id:
             raise HTTPException(status_code=404, detail="Папку не знайдено")
         
+        # Перевірка на порожнечу (якщо не force)
         sub_files = db.query(models.File).filter(models.File.folder_id == item_id).count()
         sub_folders = db.query(models.Folder).filter(models.Folder.parent_id == item_id).count()
         
         if (sub_files > 0 or sub_folders > 0) and not force:
-            raise HTTPException(status_code=409, detail="Папка містить файли")
+             raise HTTPException(status_code=409, detail="Папка містить файли")
 
-        delete_folder_recursive(item_id, db, s3, BUCKET_NAME, current_user.id)
+        # КРОК 1: Збираємо дані (Read)
+        data_to_delete = collect_deletion_data(item_id, db, current_user.id)
+        
+        # КРОК 2: Видаляємо з S3 (Batch Delete з валідацією)
+        # Фільтруємо сміття: ключ має бути рядком і не порожнім
+        valid_s3_keys = [k for k in data_to_delete['s3_keys'] if k and isinstance(k, str) and len(k.strip()) > 0]
+        
+        if valid_s3_keys:
+            # Формуємо правильну структуру для boto3
+            objects_to_delete = [{'Key': key} for key in valid_s3_keys]
+            
+            try:
+                # Видаляємо пачками по 1000 (обмеження S3 API)
+                for i in range(0, len(objects_to_delete), 1000):
+                    batch = objects_to_delete[i:i + 1000]
+                    await s3.delete_objects(
+                        Bucket=BUCKET_NAME,
+                        Delete={'Objects': batch, 'Quiet': True}
+                    )
+            except Exception as e:
+                print(f"Bulk Delete Critical Error: {e}")
+
+        # КРОК 3: Видаляємо з БД (CPU/DB Bound)
+        if data_to_delete['file_ids']:
+            db.query(models.File).filter(models.File.id.in_(data_to_delete['file_ids'])).delete(synchronize_session=False)
+      
+        for fid in reversed(data_to_delete['folder_ids']):
+             db.query(models.Folder).filter(models.Folder.id == fid).delete(synchronize_session=False)
+
         db.commit()
 
     return {"message": "Видалено"}
